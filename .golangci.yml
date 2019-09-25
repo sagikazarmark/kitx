@@ -6,6 +6,8 @@ linters-settings:
 
 linters:
     enable-all: true
+    disable:
+        - funlen
 
 service:
-    golangci-lint-version: 1.17.x
+    golangci-lint-version: 1.19.x
