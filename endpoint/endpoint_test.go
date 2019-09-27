@@ -3,10 +3,57 @@ package endpoint
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/go-kit/kit/endpoint"
 )
+
+// nolint: gochecknoglobals
+var (
+	ctx = context.Background()
+	req = struct{}{}
+)
+
+func ExampleChain() {
+	annotate := func(pos string) endpoint.Middleware {
+		return func(e endpoint.Endpoint) endpoint.Endpoint {
+			return func(ctx context.Context, req interface{}) (response interface{}, err error) {
+				fmt.Println(pos + " pre")
+
+				response, err = e(ctx, req)
+
+				fmt.Println(pos + " post")
+
+				return
+			}
+		}
+	}
+	e := endpoint.Chain(
+		annotate("first"),
+		annotate("second"),
+		annotate("third"),
+	)(
+		func(context.Context, interface{}) (interface{}, error) {
+			fmt.Println("endpoint")
+
+			return nil, nil
+		},
+	)
+
+	if _, err := e(ctx, req); err != nil {
+		panic(err)
+	}
+
+	// Output:
+	// first pre
+	// second pre
+	// third pre
+	// endpoint
+	// third post
+	// second post
+	// first post
+}
 
 type bError struct {
 	err string
