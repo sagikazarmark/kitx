@@ -200,3 +200,31 @@ func TestProblemErrorEncoder(t *testing.T) {
 		t.Errorf("unexpected body\nexpected: %s\nactual:   %s", want, have)
 	}
 }
+
+func TestWithStatusCode(t *testing.T) {
+	type resp struct {
+		ID   string `json:"id"`
+		Text string `json:"text"`
+	}
+
+	response := WithStatusCode(resp{"id", "text"}, http.StatusCreated)
+
+	statusCoder, ok := response.(kithttp.StatusCoder)
+	if !ok {
+		t.Fatal("response was expected to be a StatusCoder")
+	}
+
+	if want, have := http.StatusCreated, statusCoder.StatusCode(); want != have {
+		t.Errorf("unexpected status code\nactual:   %d\nexpected: %d", have, want)
+	}
+
+	body, err := json.Marshal(response)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedBody := `{"id":"id","text":"text"}`
+	if want, have := expectedBody, string(body); want != have {
+		t.Errorf("unexpected body\nexpected: %s\nactual:   %s", want, have)
+	}
+}
