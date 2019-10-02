@@ -20,7 +20,7 @@ go get github.com/sagikazarmark/kitx
 When all coding and testing is done, please run the test suite:
 
 ``` bash
-$ make check
+make check
 ```
 
 
