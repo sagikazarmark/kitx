@@ -37,6 +37,30 @@ func JSONResponseEncoder(ctx context.Context, w http.ResponseWriter, resp interf
 	return nil
 }
 
+// WithStatusCode wraps a response and implements the kithttp.StatusCoder interface.
+// It allows passing a status code to kithttp.EncodeJSONResponse.
+//
+// Note: it only works with JSON marshaler.
+func WithStatusCode(resp interface{}, code int) interface{} {
+	return statusCodeResponseWrapper{
+		response:   resp,
+		statusCode: code,
+	}
+}
+
+type statusCodeResponseWrapper struct {
+	response   interface{}
+	statusCode int
+}
+
+func (s statusCodeResponseWrapper) StatusCode() int {
+	return s.statusCode
+}
+
+func (s statusCodeResponseWrapper) MarshalJSON() ([]byte, error) {
+	return json.Marshal(s.response)
+}
+
 // EncodeErrorResponseFunc encodes the passed error to the HTTP response writer.
 // It's designed to be used in HTTP servers, for server-side endpoints.
 // An EncodeErrorResponseFunc is supposed to return an error with the proper HTTP status code.
