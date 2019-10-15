@@ -8,6 +8,7 @@ linters:
     enable-all: true
     disable:
         - funlen
+        - wsl
 
 service:
-    golangci-lint-version: 1.19.x
+    golangci-lint-version: 1.20.x

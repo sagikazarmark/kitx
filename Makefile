@@ -1,6 +1,7 @@
 # A Self-Documenting Makefile: http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 
 OS = $(shell uname | tr A-Z a-z)
+export PATH := $(abspath bin/):${PATH}
 
 # Build variables
 BUILD_DIR ?= build
@@ -15,7 +16,7 @@ endif
 
 # Dependency versions
 GOTESTSUM_VERSION = 0.3.5
-GOLANGCI_VERSION = 1.19.1
+GOLANGCI_VERSION = 1.20.0
 
 # Add the ability to override some variables
 # Use with care
