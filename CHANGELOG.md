@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Failer middleware
+
+### Deprecated
+
+- Business error middleware. Use Failer middleware instead.
+
 
 ## [0.3.0] - 2019-10-03
 
