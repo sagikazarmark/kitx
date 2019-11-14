@@ -55,6 +55,39 @@ func ExampleChain() {
 	// first post
 }
 
+func TestFailerMiddleware(t *testing.T) {
+	var endpointCalled bool
+	berr := errors.New("error")
+
+	var e endpoint.Endpoint = func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		endpointCalled = true
+
+		return nil, berr
+	}
+
+	e = FailerMiddleware(ErrorMatcherFunc(func(err error) bool {
+		return true
+	}))(e)
+
+	resp, err := e(context.Background(), nil)
+
+	if !endpointCalled {
+		t.Error("endpoint is supposed to be called")
+	}
+
+	if err != nil {
+		t.Error("error is supposed to be wrapped by the response")
+	}
+
+	if failer, ok := resp.(endpoint.Failer); !ok {
+		t.Error("response is supposed to be a failure response")
+
+		if !errors.Is(failer.Failed(), berr) {
+			t.Error("failure response is supposed to return the wrapped error")
+		}
+	}
+}
+
 type bError struct {
 	err string
 }
