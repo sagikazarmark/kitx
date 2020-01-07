@@ -1,6 +1,6 @@
 # Go Kit eXtensions
 
-![Build Status](https://github.com/sagikazarmark/kitx/workflows/CI/badge.svg?style=flat-square)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/sagikazarmark/kitx/CI?style=flat-square)
 [![Coverage](https://gocover.io/_badge/github.com/sagikazarmark/kitx)](https://gocover.io/github.com/sagikazarmark/kitx)
 [![Go Report Card](https://goreportcard.com/badge/github.com/sagikazarmark/kitx?style=flat-square)](https://goreportcard.com/report/github.com/sagikazarmark/kitx)
 [![GolangCI](https://golangci.com/badges/github.com/sagikazarmark/kitx.svg)](https://golangci.com/r/github.com/sagikazarmark/kitx)
