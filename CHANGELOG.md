@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - gRPC error response encoder
+- HTTP error response encoder
 
 ### Changed
 
