@@ -87,9 +87,9 @@ type ProblemFactory interface {
 	NewProblem(ctx context.Context, err error) problems.Problem
 }
 
-type defaultProblemFactory struct{}
+type defaultErrorProblemFactory struct{}
 
-func (d defaultProblemFactory) NewProblem(_ context.Context, _ error) problems.Problem {
+func (d defaultErrorProblemFactory) NewProblem(_ context.Context, _ error) problems.Problem {
 	return problems.NewDetailedProblem(http.StatusInternalServerError, "something went wrong")
 }
 
@@ -117,7 +117,7 @@ func NewJSONProblemErrorEncoder(problemFactory ProblemFactory) kithttp.ErrorEnco
 //
 // The returned encoder encodes every error as 500 Internal Server Error.
 func NewDefaultJSONProblemErrorEncoder() kithttp.ErrorEncoder {
-	return NewJSONProblemErrorEncoder(defaultProblemFactory{})
+	return NewJSONProblemErrorEncoder(defaultErrorProblemFactory{})
 }
 
 // NewXMLProblemErrorEncoder returns an error encoder that encodes errors following the
@@ -144,7 +144,7 @@ func NewXMLProblemErrorEncoder(problemFactory ProblemFactory) kithttp.ErrorEncod
 //
 // The returned encoder encodes every error as 500 Internal Server Error.
 func NewDefaultXMLProblemErrorEncoder() kithttp.ErrorEncoder {
-	return NewXMLProblemErrorEncoder(defaultProblemFactory{})
+	return NewXMLProblemErrorEncoder(defaultErrorProblemFactory{})
 }
 
 // nolint: gochecknoglobals
