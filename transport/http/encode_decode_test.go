@@ -200,11 +200,11 @@ func TestErrorResponseEncoder(t *testing.T) {
 	})
 }
 
-type problemFactoryStub struct {
+type problemConverterStub struct {
 	problem problems.Problem
 }
 
-func (f problemFactoryStub) NewProblem(_ context.Context, _ error) problems.Problem {
+func (f problemConverterStub) NewProblem(_ context.Context, _ error) problems.Problem {
 	return f.problem
 }
 
@@ -223,13 +223,13 @@ func testStatusAndContentType(t *testing.T, resp *http.Response, status int, con
 // nolint: dupl
 func TestNewJSONProblemErrorEncoder(t *testing.T) {
 	t.Run("without_status", func(t *testing.T) {
-		factory := problemFactoryStub{problems.NewProblem()}
+		problemConverter := problemConverterStub{problems.NewProblem()}
 
-		encoder := NewJSONProblemErrorEncoder(factory)
+		errorEncoder := NewJSONProblemErrorEncoder(problemConverter)
 
 		w := httptest.NewRecorder()
 
-		encoder(context.Background(), errors.New("error"), w)
+		errorEncoder(context.Background(), errors.New("error"), w)
 
 		resp := w.Result()
 		defer resp.Body.Close()
@@ -238,13 +238,13 @@ func TestNewJSONProblemErrorEncoder(t *testing.T) {
 	})
 
 	t.Run("with_empty_status", func(t *testing.T) {
-		factory := problemFactoryStub{problems.NewDetailedProblem(0, "error")}
+		problemConverter := problemConverterStub{problems.NewDetailedProblem(0, "error")}
 
-		encoder := NewJSONProblemErrorEncoder(factory)
+		errorEncoder := NewJSONProblemErrorEncoder(problemConverter)
 
 		w := httptest.NewRecorder()
 
-		encoder(context.Background(), errors.New("error"), w)
+		errorEncoder(context.Background(), errors.New("error"), w)
 
 		resp := w.Result()
 		defer resp.Body.Close()
@@ -266,13 +266,13 @@ func TestNewJSONProblemErrorEncoder(t *testing.T) {
 	})
 
 	t.Run("with_status", func(t *testing.T) {
-		factory := problemFactoryStub{problems.NewDetailedProblem(http.StatusNotFound, "error")}
+		problemConverter := problemConverterStub{problems.NewDetailedProblem(http.StatusNotFound, "error")}
 
-		encoder := NewJSONProblemErrorEncoder(factory)
+		errorEncoder := NewJSONProblemErrorEncoder(problemConverter)
 
 		w := httptest.NewRecorder()
 
-		encoder(context.Background(), errors.New("error"), w)
+		errorEncoder(context.Background(), errors.New("error"), w)
 
 		resp := w.Result()
 		defer resp.Body.Close()
@@ -283,11 +283,11 @@ func TestNewJSONProblemErrorEncoder(t *testing.T) {
 
 // nolint: dupl
 func TestNewDefaultJSONProblemErrorEncoder(t *testing.T) {
-	encoder := NewDefaultJSONProblemErrorEncoder()
+	errorEncoder := NewDefaultJSONProblemErrorEncoder()
 
 	w := httptest.NewRecorder()
 
-	encoder(context.Background(), errors.New("error"), w)
+	errorEncoder(context.Background(), errors.New("error"), w)
 
 	resp := w.Result()
 	defer resp.Body.Close()
@@ -311,13 +311,13 @@ func TestNewDefaultJSONProblemErrorEncoder(t *testing.T) {
 // nolint: dupl
 func TestNewXMLProblemErrorEncoder(t *testing.T) {
 	t.Run("without_status", func(t *testing.T) {
-		factory := problemFactoryStub{problems.NewProblem()}
+		problemConverter := problemConverterStub{problems.NewProblem()}
 
-		encoder := NewXMLProblemErrorEncoder(factory)
+		errorEncoder := NewXMLProblemErrorEncoder(problemConverter)
 
 		w := httptest.NewRecorder()
 
-		encoder(context.Background(), errors.New("error"), w)
+		errorEncoder(context.Background(), errors.New("error"), w)
 
 		resp := w.Result()
 		defer resp.Body.Close()
@@ -326,13 +326,13 @@ func TestNewXMLProblemErrorEncoder(t *testing.T) {
 	})
 
 	t.Run("with_empty_status", func(t *testing.T) {
-		factory := problemFactoryStub{problems.NewDetailedProblem(0, "error")}
+		problemConverter := problemConverterStub{problems.NewDetailedProblem(0, "error")}
 
-		encoder := NewXMLProblemErrorEncoder(factory)
+		errorEncoder := NewXMLProblemErrorEncoder(problemConverter)
 
 		w := httptest.NewRecorder()
 
-		encoder(context.Background(), errors.New("error"), w)
+		errorEncoder(context.Background(), errors.New("error"), w)
 
 		resp := w.Result()
 		defer resp.Body.Close()
@@ -354,13 +354,13 @@ func TestNewXMLProblemErrorEncoder(t *testing.T) {
 	})
 
 	t.Run("with_status", func(t *testing.T) {
-		factory := problemFactoryStub{problems.NewDetailedProblem(http.StatusNotFound, "error")}
+		problemConverter := problemConverterStub{problems.NewDetailedProblem(http.StatusNotFound, "error")}
 
-		encoder := NewXMLProblemErrorEncoder(factory)
+		errorEncoder := NewXMLProblemErrorEncoder(problemConverter)
 
 		w := httptest.NewRecorder()
 
-		encoder(context.Background(), errors.New("error"), w)
+		errorEncoder(context.Background(), errors.New("error"), w)
 
 		resp := w.Result()
 		defer resp.Body.Close()
@@ -371,11 +371,11 @@ func TestNewXMLProblemErrorEncoder(t *testing.T) {
 
 // nolint: dupl
 func TestNewDefaultXMLProblemErrorEncoder(t *testing.T) {
-	encoder := NewDefaultXMLProblemErrorEncoder()
+	errorEncoder := NewDefaultXMLProblemErrorEncoder()
 
 	w := httptest.NewRecorder()
 
-	encoder(context.Background(), errors.New("error"), w)
+	errorEncoder(context.Background(), errors.New("error"), w)
 
 	resp := w.Result()
 	defer resp.Body.Close()
