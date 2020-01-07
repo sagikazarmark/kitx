@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Better problem error encoding tools
+
+### Deprecated
+
+- `ProblemErrorEncoder` error encoder. Use the alternative problem error encoders.
+
 
 ## [0.4.0] - 2019-11-14
 
