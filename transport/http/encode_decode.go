@@ -87,15 +87,15 @@ func errorResponseEncoderWrapper(errorEncoder EncodeErrorResponseFunc) kithttp.E
 	}
 }
 
-// ProblemFactory creates a new RFC-7807 Problem from an error.
-type ProblemFactory interface {
+// ProblemConverter creates a new RFC-7807 Problem from an error.
+type ProblemConverter interface {
 	// NewProblem creates a new RFC-7807 Problem from an error.
 	NewProblem(ctx context.Context, err error) problems.Problem
 }
 
-type defaultErrorProblemFactory struct{}
+type defaultErrorProblemConverter struct{}
 
-func (d defaultErrorProblemFactory) NewProblem(_ context.Context, _ error) problems.Problem {
+func (d defaultErrorProblemConverter) NewProblem(_ context.Context, _ error) problems.Problem {
 	return problems.NewDetailedProblem(http.StatusInternalServerError, "something went wrong")
 }
 
@@ -103,9 +103,9 @@ func (d defaultErrorProblemFactory) NewProblem(_ context.Context, _ error) probl
 // RFC-7807 (Problem Details) standard (in JSON format).
 //
 // See details at https://tools.ietf.org/html/rfc7807
-func NewJSONProblemErrorResponseEncoder(problemFactory ProblemFactory) EncodeErrorResponseFunc {
+func NewJSONProblemErrorResponseEncoder(problemConverter ProblemConverter) EncodeErrorResponseFunc {
 	return func(ctx context.Context, w http.ResponseWriter, err error) error {
-		problem := problemFactory.NewProblem(ctx, err)
+		problem := problemConverter.NewProblem(ctx, err)
 
 		w.Header().Set("Content-Type", problems.ProblemMediaType)
 		if s, ok := problem.(problems.StatusProblem); ok && s.ProblemStatus() != 0 {
@@ -123,16 +123,16 @@ func NewJSONProblemErrorResponseEncoder(problemFactory ProblemFactory) EncodeErr
 //
 // The returned encoder encodes every error as 500 Internal Server Error.
 func NewDefaultJSONProblemErrorResponseEncoder() EncodeErrorResponseFunc {
-	return NewJSONProblemErrorResponseEncoder(defaultErrorProblemFactory{})
+	return NewJSONProblemErrorResponseEncoder(defaultErrorProblemConverter{})
 }
 
 // NewXMLProblemErrorResponseEncoder returns an error response encoder that encodes errors following the
 // RFC-7807 (Problem Details) standard (in XML format).
 //
 // See details at https://tools.ietf.org/html/rfc7807
-func NewXMLProblemErrorResponseEncoder(problemFactory ProblemFactory) EncodeErrorResponseFunc {
+func NewXMLProblemErrorResponseEncoder(problemConverter ProblemConverter) EncodeErrorResponseFunc {
 	return func(ctx context.Context, w http.ResponseWriter, err error) error {
-		problem := problemFactory.NewProblem(ctx, err)
+		problem := problemConverter.NewProblem(ctx, err)
 
 		w.Header().Set("Content-Type", problems.ProblemMediaTypeXML)
 		if s, ok := problem.(problems.StatusProblem); ok && s.ProblemStatus() != 0 {
@@ -150,15 +150,15 @@ func NewXMLProblemErrorResponseEncoder(problemFactory ProblemFactory) EncodeErro
 //
 // The returned encoder encodes every error as 500 Internal Server Error.
 func NewDefaultXMLProblemErrorResponseEncoder() EncodeErrorResponseFunc {
-	return NewXMLProblemErrorResponseEncoder(defaultErrorProblemFactory{})
+	return NewXMLProblemErrorResponseEncoder(defaultErrorProblemConverter{})
 }
 
 // NewJSONProblemErrorEncoder returns an error encoder that encodes errors following the
 // RFC-7807 (Problem Details) standard (in JSON format).
 //
 // See details at https://tools.ietf.org/html/rfc7807
-func NewJSONProblemErrorEncoder(problemFactory ProblemFactory) kithttp.ErrorEncoder {
-	return errorResponseEncoderWrapper(NewJSONProblemErrorResponseEncoder(problemFactory))
+func NewJSONProblemErrorEncoder(problemConverter ProblemConverter) kithttp.ErrorEncoder {
+	return errorResponseEncoderWrapper(NewJSONProblemErrorResponseEncoder(problemConverter))
 }
 
 // NewDefaultJSONProblemErrorEncoder returns an error encoder that encodes errors following the
@@ -175,8 +175,8 @@ func NewDefaultJSONProblemErrorEncoder() kithttp.ErrorEncoder {
 // RFC-7807 (Problem Details) standard (in XML format).
 //
 // See details at https://tools.ietf.org/html/rfc7807
-func NewXMLProblemErrorEncoder(problemFactory ProblemFactory) kithttp.ErrorEncoder {
-	return errorResponseEncoderWrapper(NewXMLProblemErrorResponseEncoder(problemFactory))
+func NewXMLProblemErrorEncoder(problemConverter ProblemConverter) kithttp.ErrorEncoder {
+	return errorResponseEncoderWrapper(NewXMLProblemErrorResponseEncoder(problemConverter))
 }
 
 // NewDefaultXMLProblemErrorEncoder returns an error encoder that encodes errors following the

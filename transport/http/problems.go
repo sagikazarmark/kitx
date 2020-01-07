@@ -57,98 +57,98 @@ func (m statusProblemMatcher) Status() int {
 	return m.status
 }
 
-// StatusProblemFactory creates a new status problem instance.
-type StatusProblemFactory interface {
+// StatusProblemConverter creates a new status problem instance.
+type StatusProblemConverter interface {
 	// NewStatusProblem creates a new status problem instance.
 	NewStatusProblem(ctx context.Context, status int, err error) problems.StatusProblem
 }
 
-type defaultProblemFactory struct{}
+type defaultProblemConverter struct{}
 
-func (d defaultProblemFactory) NewProblem(_ context.Context, err error) problems.Problem {
+func (d defaultProblemConverter) NewProblem(_ context.Context, err error) problems.Problem {
 	return problems.NewDetailedProblem(http.StatusInternalServerError, err.Error())
 }
 
-func (d defaultProblemFactory) NewStatusProblem(_ context.Context, status int, err error) problems.StatusProblem {
+func (d defaultProblemConverter) NewStatusProblem(_ context.Context, status int, err error) problems.StatusProblem {
 	return problems.NewDetailedProblem(status, err.Error())
 }
 
-type problemFactory struct {
+type problemConverter struct {
 	matchers []ProblemMatcher
 
-	problemFactory       ProblemFactory
-	statusProblemFactory StatusProblemFactory
+	problemConverter       ProblemConverter
+	statusProblemConverter StatusProblemConverter
 }
 
-// ProblemFactoryConfig configures the ProblemFactory implementation.
-type ProblemFactoryConfig struct {
+// ProblemConverterConfig configures the ProblemConverter implementation.
+type ProblemConverterConfig struct {
 	// Matchers are used to match errors and create problems.
 	// By default an empty detailed problem is created.
 	// If no matchers match the error (or no matchers are configured) a fallback problem is created/returned.
 	//
-	// If a matcher also implements ProblemFactory it is used instead of the builtin ProblemFactory
+	// If a matcher also implements ProblemConverter it is used instead of the builtin ProblemConverter
 	// for creating the problem instance.
 	//
-	// If a matchers also implements StatusProblemMatcher and StatusProblemFactory
-	// it is used instead of the builtin StatusProblemFactory for creating the problem instance.
+	// If a matchers also implements StatusProblemMatcher and StatusProblemConverter
+	// it is used instead of the builtin StatusProblemConverter for creating the problem instance.
 	//
-	// If a matchers also implements StatusProblemMatcher (but not StatusProblemFactory)
-	// the builtin StatusProblemFactory is used for creating the problem instance.
+	// If a matchers also implements StatusProblemMatcher (but not StatusProblemConverter)
+	// the builtin StatusProblemConverter is used for creating the problem instance.
 	Matchers []ProblemMatcher
 
-	// Problem factories used for creating problems.
-	ProblemFactory       ProblemFactory
-	StatusProblemFactory StatusProblemFactory
+	// Problem converters used for converting errors to problems.
+	ProblemConverter       ProblemConverter
+	StatusProblemConverter StatusProblemConverter
 }
 
-// NewProblemFactory returns a new ProblemFactory implementation.
-func NewProblemFactory(config ProblemFactoryConfig) ProblemFactory {
-	f := problemFactory{
-		matchers:             config.Matchers,
-		problemFactory:       config.ProblemFactory,
-		statusProblemFactory: config.StatusProblemFactory,
+// NewProblemConverter returns a new ProblemConverter implementation.
+func NewProblemConverter(config ProblemConverterConfig) ProblemConverter {
+	c := problemConverter{
+		matchers:               config.Matchers,
+		problemConverter:       config.ProblemConverter,
+		statusProblemConverter: config.StatusProblemConverter,
 	}
 
-	if f.problemFactory == nil {
-		f.problemFactory = defaultProblemFactory{}
+	if c.problemConverter == nil {
+		c.problemConverter = defaultProblemConverter{}
 	}
 
-	if f.statusProblemFactory == nil {
-		if spf, ok := f.problemFactory.(StatusProblemFactory); ok {
-			f.statusProblemFactory = spf
+	if c.statusProblemConverter == nil {
+		if spc, ok := c.problemConverter.(StatusProblemConverter); ok {
+			c.statusProblemConverter = spc
 		} else {
-			f.statusProblemFactory = defaultProblemFactory{}
+			c.statusProblemConverter = defaultProblemConverter{}
 		}
 	}
 
-	return f
+	return c
 }
 
-// NewDefaultProblemFactory returns a new ProblemFactory implementation with default configuration.
-func NewDefaultProblemFactory() ProblemFactory {
-	return NewProblemFactory(ProblemFactoryConfig{})
+// NewDefaultProblemFactory returns a new ProblemConverter implementation with default configuration.
+func NewDefaultProblemFactory() ProblemConverter {
+	return NewProblemConverter(ProblemConverterConfig{})
 }
 
-func (f problemFactory) NewProblem(ctx context.Context, err error) problems.Problem {
-	for _, matcher := range f.matchers {
+func (c problemConverter) NewProblem(ctx context.Context, err error) problems.Problem {
+	for _, matcher := range c.matchers {
 		if matcher.MatchError(err) {
-			if pf, ok := matcher.(ProblemFactory); ok {
-				return pf.NewProblem(ctx, err)
+			if converter, ok := matcher.(ProblemConverter); ok {
+				return converter.NewProblem(ctx, err)
 			}
 
 			if statusMatcher, ok := matcher.(StatusProblemMatcher); ok {
-				if spf, ok := statusMatcher.(StatusProblemFactory); ok {
-					return spf.NewStatusProblem(ctx, statusMatcher.Status(), err)
+				if converter, ok := statusMatcher.(StatusProblemConverter); ok {
+					return converter.NewStatusProblem(ctx, statusMatcher.Status(), err)
 				}
 
-				return f.statusProblemFactory.NewStatusProblem(ctx, statusMatcher.Status(), err)
+				return c.statusProblemConverter.NewStatusProblem(ctx, statusMatcher.Status(), err)
 			}
 
-			return f.problemFactory.NewProblem(ctx, err)
+			return c.problemConverter.NewProblem(ctx, err)
 		}
 	}
 
-	return f.statusProblemFactory.NewStatusProblem(
+	return c.statusProblemConverter.NewStatusProblem(
 		ctx,
 		http.StatusInternalServerError,
 		errors.New("something went wrong"),

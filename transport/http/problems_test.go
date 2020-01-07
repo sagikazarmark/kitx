@@ -38,15 +38,15 @@ func (s matcherStub) MatchError(err error) bool {
 	return s.err == err
 }
 
-type matcherFactoryStub struct {
+type matcherConverterStub struct {
 	err error
 }
 
-func (s matcherFactoryStub) MatchError(err error) bool {
+func (s matcherConverterStub) MatchError(err error) bool {
 	return s.err == err
 }
 
-func (s matcherFactoryStub) NewProblem(_ context.Context, err error) problems.Problem {
+func (s matcherConverterStub) NewProblem(_ context.Context, err error) problems.Problem {
 	return problems.NewDetailedProblem(http.StatusServiceUnavailable, "my error")
 }
 
@@ -63,28 +63,28 @@ func (s statusMatcherStub) Status() int {
 	return s.status
 }
 
-type statusMatcherFactoryStub struct {
+type statusMatcherConverterStub struct {
 	statusMatcherStub
 }
 
-func (s statusMatcherFactoryStub) NewProblem(_ context.Context, _ error) problems.Problem {
+func (s statusMatcherConverterStub) NewProblem(_ context.Context, _ error) problems.Problem {
 	return problems.NewDetailedProblem(http.StatusBadRequest, "custom error")
 }
 
-type statusMatcherStatusFactoryStub struct {
+type statusMatcherStatusConverterStub struct {
 	err    error
 	status int
 }
 
-func (s statusMatcherStatusFactoryStub) MatchError(err error) bool {
+func (s statusMatcherStatusConverterStub) MatchError(err error) bool {
 	return s.err == err
 }
 
-func (s statusMatcherStatusFactoryStub) Status() int {
+func (s statusMatcherStatusConverterStub) Status() int {
 	return s.status
 }
 
-func (s statusMatcherStatusFactoryStub) NewStatusProblem(
+func (s statusMatcherStatusConverterStub) NewStatusProblem(
 	_ context.Context,
 	status int,
 	_ error,
@@ -104,11 +104,11 @@ func testProblemEquals(t *testing.T, problem *problems.DefaultProblem, status in
 	}
 }
 
-func TestProblemFactory(t *testing.T) {
+func TestProblemConverter(t *testing.T) {
 	t.Run("default", func(t *testing.T) {
-		tests := []ProblemFactory{
+		tests := []ProblemConverter{
 			NewDefaultProblemFactory(),
-			NewProblemFactory(ProblemFactoryConfig{}),
+			NewProblemConverter(ProblemConverterConfig{}),
 		}
 
 		for _, factory := range tests {
@@ -126,12 +126,12 @@ func TestProblemFactory(t *testing.T) {
 		err := errors.New("error")
 
 		tests := []struct {
-			config ProblemFactoryConfig
+			config ProblemConverterConfig
 			status int
 			detail string
 		}{
 			{
-				config: ProblemFactoryConfig{
+				config: ProblemConverterConfig{
 					Matchers: []ProblemMatcher{
 						statusMatcherStub{
 							err:    err,
@@ -143,9 +143,9 @@ func TestProblemFactory(t *testing.T) {
 				detail: "error",
 			},
 			{
-				config: ProblemFactoryConfig{
+				config: ProblemConverterConfig{
 					Matchers: []ProblemMatcher{
-						statusMatcherFactoryStub{
+						statusMatcherConverterStub{
 							statusMatcherStub: statusMatcherStub{
 								err:    err,
 								status: http.StatusNotFound,
@@ -157,9 +157,9 @@ func TestProblemFactory(t *testing.T) {
 				detail: "custom error",
 			},
 			{
-				config: ProblemFactoryConfig{
+				config: ProblemConverterConfig{
 					Matchers: []ProblemMatcher{
-						statusMatcherStatusFactoryStub{
+						statusMatcherStatusConverterStub{
 							err:    err,
 							status: http.StatusNotFound,
 						},
@@ -169,7 +169,7 @@ func TestProblemFactory(t *testing.T) {
 				detail: "custom status error",
 			},
 			{
-				config: ProblemFactoryConfig{
+				config: ProblemConverterConfig{
 					Matchers: []ProblemMatcher{
 						matcherStub{
 							err: err,
@@ -180,9 +180,9 @@ func TestProblemFactory(t *testing.T) {
 				detail: "error",
 			},
 			{
-				config: ProblemFactoryConfig{
+				config: ProblemConverterConfig{
 					Matchers: []ProblemMatcher{
-						matcherFactoryStub{
+						matcherConverterStub{
 							err: err,
 						},
 					},
@@ -196,7 +196,7 @@ func TestProblemFactory(t *testing.T) {
 			test := test
 
 			t.Run("", func(t *testing.T) {
-				factory := NewProblemFactory(test.config)
+				factory := NewProblemConverter(test.config)
 
 				problem := factory.NewProblem(context.Background(), err).(*problems.DefaultProblem)
 
@@ -206,8 +206,8 @@ func TestProblemFactory(t *testing.T) {
 	})
 }
 
-func ExampleNewProblemFactory() {
-	factory := NewProblemFactory(ProblemFactoryConfig{
+func ExampleNewProblemConverter() {
+	factory := NewProblemConverter(ProblemConverterConfig{
 		Matchers: []ProblemMatcher{
 			NewStatusProblemMatcher(http.StatusNotFound, ErrorMatcherFunc(func(err error) bool {
 				return err.Error() == "not found"
