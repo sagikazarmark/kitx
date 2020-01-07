@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- Renamed `ProblemFactory` to `ProblemConverter`
+
 
 ## [0.5.0] - 2020-01-07
 
