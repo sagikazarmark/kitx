@@ -78,8 +78,6 @@ type problemFactory struct {
 
 	problemFactory       ProblemFactory
 	statusProblemFactory StatusProblemFactory
-
-	fallbackProblem problems.Problem
 }
 
 // ProblemFactoryConfig configures the ProblemFactory implementation.
@@ -101,9 +99,6 @@ type ProblemFactoryConfig struct {
 	// Problem factories used for creating problems.
 	ProblemFactory       ProblemFactory
 	StatusProblemFactory StatusProblemFactory
-
-	// FallbackProblem is an optional problem instance returned when not matchers match the error.
-	FallbackProblem problems.Problem
 }
 
 // NewProblemFactory returns a new ProblemFactory implementation.
@@ -112,7 +107,6 @@ func NewProblemFactory(config ProblemFactoryConfig) ProblemFactory {
 		matchers:             config.Matchers,
 		problemFactory:       config.ProblemFactory,
 		statusProblemFactory: config.StatusProblemFactory,
-		fallbackProblem:      config.FallbackProblem,
 	}
 
 	if f.problemFactory == nil {
@@ -126,10 +120,6 @@ func NewProblemFactory(config ProblemFactoryConfig) ProblemFactory {
 			f.statusProblemFactory = defaultProblemFactory{}
 		}
 	}
-
-	// Fallback problem intentionally has no default
-	// A new problem is created each time, passing the context to the factory
-	// A factory can attach correlation/request ID to every problem this way
 
 	return f
 }
@@ -156,10 +146,6 @@ func (f problemFactory) NewProblem(ctx context.Context, err error) problems.Prob
 
 			return f.problemFactory.NewProblem(ctx, err)
 		}
-	}
-
-	if f.fallbackProblem != nil {
-		return f.fallbackProblem
 	}
 
 	return f.statusProblemFactory.NewStatusProblem(
