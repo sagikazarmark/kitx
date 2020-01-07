@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -197,6 +198,202 @@ func TestErrorResponseEncoder(t *testing.T) {
 			t.Errorf("unexpected body\nexpected: %s\nactual:   %s", want, have)
 		}
 	})
+}
+
+type problemFactoryStub struct {
+	problem problems.Problem
+}
+
+func (f problemFactoryStub) NewProblem(_ context.Context, _ error) problems.Problem {
+	return f.problem
+}
+
+func testStatusAndContentType(t *testing.T, resp *http.Response, status int, contentType string) {
+	t.Helper()
+
+	if want, have := status, resp.StatusCode; want != have {
+		t.Errorf("unexpected status\nexpected: %d\nactual:   %d", want, have)
+	}
+
+	if want, have := contentType, resp.Header.Get("Content-Type"); want != have {
+		t.Errorf("unexpected content type\nexpected: %s\nactual:   %s", want, have)
+	}
+}
+
+// nolint: dupl
+func TestNewJSONProblemErrorEncoder(t *testing.T) {
+	t.Run("without_status", func(t *testing.T) {
+		factory := problemFactoryStub{problems.NewProblem()}
+
+		encoder := NewJSONProblemErrorEncoder(factory)
+
+		w := httptest.NewRecorder()
+
+		encoder(context.Background(), errors.New("error"), w)
+
+		resp := w.Result()
+		defer resp.Body.Close()
+
+		testStatusAndContentType(t, resp, http.StatusOK, problems.ProblemMediaType)
+	})
+
+	t.Run("with_empty_status", func(t *testing.T) {
+		factory := problemFactoryStub{problems.NewDetailedProblem(0, "error")}
+
+		encoder := NewJSONProblemErrorEncoder(factory)
+
+		w := httptest.NewRecorder()
+
+		encoder(context.Background(), errors.New("error"), w)
+
+		resp := w.Result()
+		defer resp.Body.Close()
+
+		testStatusAndContentType(t, resp, http.StatusOK, problems.ProblemMediaType)
+
+		var details struct {
+			Detail string `json:"detail"`
+		}
+
+		err := json.NewDecoder(resp.Body).Decode(&details)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if want, have := "error", details.Detail; want != have {
+			t.Errorf("unexpected detail\nexpected: %s\nactual:   %s", want, have)
+		}
+	})
+
+	t.Run("with_status", func(t *testing.T) {
+		factory := problemFactoryStub{problems.NewDetailedProblem(http.StatusNotFound, "error")}
+
+		encoder := NewJSONProblemErrorEncoder(factory)
+
+		w := httptest.NewRecorder()
+
+		encoder(context.Background(), errors.New("error"), w)
+
+		resp := w.Result()
+		defer resp.Body.Close()
+
+		testStatusAndContentType(t, resp, http.StatusNotFound, problems.ProblemMediaType)
+	})
+}
+
+// nolint: dupl
+func TestNewDefaultJSONProblemErrorEncoder(t *testing.T) {
+	encoder := NewDefaultJSONProblemErrorEncoder()
+
+	w := httptest.NewRecorder()
+
+	encoder(context.Background(), errors.New("error"), w)
+
+	resp := w.Result()
+	defer resp.Body.Close()
+
+	testStatusAndContentType(t, resp, http.StatusInternalServerError, problems.ProblemMediaType)
+
+	var details struct {
+		Detail string `json:"detail"`
+	}
+
+	err := json.NewDecoder(resp.Body).Decode(&details)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if want, have := "something went wrong", details.Detail; want != have {
+		t.Errorf("unexpected detail\nexpected: %s\nactual:   %s", want, have)
+	}
+}
+
+// nolint: dupl
+func TestNewXMLProblemErrorEncoder(t *testing.T) {
+	t.Run("without_status", func(t *testing.T) {
+		factory := problemFactoryStub{problems.NewProblem()}
+
+		encoder := NewXMLProblemErrorEncoder(factory)
+
+		w := httptest.NewRecorder()
+
+		encoder(context.Background(), errors.New("error"), w)
+
+		resp := w.Result()
+		defer resp.Body.Close()
+
+		testStatusAndContentType(t, resp, http.StatusOK, problems.ProblemMediaTypeXML)
+	})
+
+	t.Run("with_empty_status", func(t *testing.T) {
+		factory := problemFactoryStub{problems.NewDetailedProblem(0, "error")}
+
+		encoder := NewXMLProblemErrorEncoder(factory)
+
+		w := httptest.NewRecorder()
+
+		encoder(context.Background(), errors.New("error"), w)
+
+		resp := w.Result()
+		defer resp.Body.Close()
+
+		testStatusAndContentType(t, resp, http.StatusOK, problems.ProblemMediaTypeXML)
+
+		var details struct {
+			Detail string `xml:""`
+		}
+
+		err := xml.NewDecoder(resp.Body).Decode(&details)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if want, have := "error", details.Detail; want != have {
+			t.Errorf("unexpected detail\nexpected: %s\nactual:   %s", want, have)
+		}
+	})
+
+	t.Run("with_status", func(t *testing.T) {
+		factory := problemFactoryStub{problems.NewDetailedProblem(http.StatusNotFound, "error")}
+
+		encoder := NewXMLProblemErrorEncoder(factory)
+
+		w := httptest.NewRecorder()
+
+		encoder(context.Background(), errors.New("error"), w)
+
+		resp := w.Result()
+		defer resp.Body.Close()
+
+		testStatusAndContentType(t, resp, http.StatusNotFound, problems.ProblemMediaTypeXML)
+	})
+}
+
+// nolint: dupl
+func TestNewDefaultXMLProblemErrorEncoder(t *testing.T) {
+	encoder := NewDefaultXMLProblemErrorEncoder()
+
+	w := httptest.NewRecorder()
+
+	encoder(context.Background(), errors.New("error"), w)
+
+	resp := w.Result()
+	defer resp.Body.Close()
+
+	testStatusAndContentType(t, resp, http.StatusInternalServerError, problems.ProblemMediaTypeXML)
+
+	var details struct {
+		Detail string `xml:""`
+	}
+
+	err := xml.NewDecoder(resp.Body).Decode(&details)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if want, have := "something went wrong", details.Detail; want != have {
+		t.Errorf("unexpected detail\nexpected: %s\nactual:   %s", want, have)
+	}
 }
 
 func TestProblemErrorEncoder(t *testing.T) {
