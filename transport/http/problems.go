@@ -137,10 +137,6 @@ func (c problemConverter) NewProblem(ctx context.Context, err error) problems.Pr
 			}
 
 			if statusMatcher, ok := matcher.(StatusProblemMatcher); ok {
-				if converter, ok := statusMatcher.(StatusProblemConverter); ok {
-					return converter.NewStatusProblem(ctx, statusMatcher.Status(), err)
-				}
-
 				return c.statusProblemConverter.NewStatusProblem(ctx, statusMatcher.Status(), err)
 			}
 
