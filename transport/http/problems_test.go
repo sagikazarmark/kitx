@@ -71,27 +71,6 @@ func (s statusMatcherConverterStub) NewProblem(_ context.Context, _ error) probl
 	return problems.NewDetailedProblem(http.StatusBadRequest, "custom error")
 }
 
-type statusMatcherStatusConverterStub struct {
-	err    error
-	status int
-}
-
-func (s statusMatcherStatusConverterStub) MatchError(err error) bool {
-	return s.err == err
-}
-
-func (s statusMatcherStatusConverterStub) Status() int {
-	return s.status
-}
-
-func (s statusMatcherStatusConverterStub) NewStatusProblem(
-	_ context.Context,
-	status int,
-	_ error,
-) problems.StatusProblem {
-	return problems.NewDetailedProblem(status, "custom status error")
-}
-
 func testProblemEquals(t *testing.T, problem *problems.DefaultProblem, status int, detail string) {
 	t.Helper()
 
@@ -155,18 +134,6 @@ func TestProblemConverter(t *testing.T) {
 				},
 				status: http.StatusBadRequest,
 				detail: "custom error",
-			},
-			{
-				config: ProblemConverterConfig{
-					Matchers: []ProblemMatcher{
-						statusMatcherStatusConverterStub{
-							err:    err,
-							status: http.StatusNotFound,
-						},
-					},
-				},
-				status: http.StatusNotFound,
-				detail: "custom status error",
 			},
 			{
 				config: ProblemConverterConfig{
