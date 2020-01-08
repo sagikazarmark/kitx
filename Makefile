@@ -36,14 +36,13 @@ bin/gotestsum-${GOTESTSUM_VERSION}:
 	curl -L https://github.com/gotestyourself/gotestsum/releases/download/v${GOTESTSUM_VERSION}/gotestsum_${GOTESTSUM_VERSION}_${OS}_amd64.tar.gz | tar -zOxf - gotestsum > ./bin/gotestsum-${GOTESTSUM_VERSION} && chmod +x ./bin/gotestsum-${GOTESTSUM_VERSION}
 
 TEST_PKGS ?= ./...
-TEST_REPORT_NAME ?= results.xml
 .PHONY: test
-test: TEST_REPORT ?= main
 test: TEST_FORMAT ?= short
 test: SHELL = /bin/bash
+test: export CGO_ENABLED=1
 test: bin/gotestsum ## Run tests
-	@mkdir -p ${BUILD_DIR}/test_results/${TEST_REPORT}
-	bin/gotestsum --no-summary=skipped --junitfile ${BUILD_DIR}/test_results/${TEST_REPORT}/${TEST_REPORT_NAME} --format ${TEST_FORMAT} -- $(filter-out -v,${GOARGS}) $(if ${TEST_PKGS},${TEST_PKGS},./...)
+	@mkdir -p ${BUILD_DIR}
+	bin/gotestsum --no-summary=skipped --junitfile ${BUILD_DIR}/coverage.xml --format ${TEST_FORMAT} -- -race -coverprofile=${BUILD_DIR}/coverage.txt -covermode=atomic $(filter-out -v,${GOARGS}) $(if ${TEST_PKGS},${TEST_PKGS},./...)
 
 bin/golangci-lint: bin/golangci-lint-${GOLANGCI_VERSION}
 	@ln -sf golangci-lint-${GOLANGCI_VERSION} bin/golangci-lint
