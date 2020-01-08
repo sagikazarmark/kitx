@@ -27,5 +27,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Tests
+      - name: Run tests
         run: make test
+
+      - name: Upload coverage
+        run: bash <(curl -s https://codecov.io/bash) -f build/coverage.txt
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
