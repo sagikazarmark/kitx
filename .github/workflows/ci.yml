@@ -36,4 +36,3 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: build/coverage.txt
-          fail_ci_if_error: true
