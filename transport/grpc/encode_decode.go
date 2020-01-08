@@ -42,6 +42,11 @@ func (d defaultErrorStatusConverter) NewStatus(_ context.Context, _ error) *stat
 // NewStatusErrorResponseEncoder returns an error response encoder that encodes errors as gRPC Status errors.
 func NewStatusErrorResponseEncoder(statusConverter StatusConverter) EncodeErrorResponseFunc {
 	return func(ctx context.Context, err error) error {
+		// Do not convert gRPC errors
+		if IsGRPCError(err) {
+			return err
+		}
+
 		return statusConverter.NewStatus(ctx, err).Err()
 	}
 }
