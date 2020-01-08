@@ -14,7 +14,7 @@ type errorMatcherStub struct {
 	match bool
 }
 
-func (e errorMatcherStub) MatchError(err error) bool {
+func (e errorMatcherStub) MatchError(_ error) bool {
 	return e.match
 }
 
@@ -46,7 +46,7 @@ func (s matcherConverterStub) MatchError(err error) bool {
 	return s.err == err
 }
 
-func (s matcherConverterStub) NewProblem(_ context.Context, err error) problems.Problem {
+func (s matcherConverterStub) NewProblem(_ context.Context, _ error) problems.Problem {
 	return problems.NewDetailedProblem(http.StatusServiceUnavailable, "my error")
 }
 
@@ -107,15 +107,15 @@ func testProblemEquals(t *testing.T, problem *problems.DefaultProblem, status in
 func TestProblemConverter(t *testing.T) {
 	t.Run("default", func(t *testing.T) {
 		tests := []ProblemConverter{
-			NewDefaultProblemFactory(),
+			NewDefaultProblemConverter(),
 			NewProblemConverter(ProblemConverterConfig{}),
 		}
 
-		for _, factory := range tests {
-			factory := factory
+		for _, problemConverter := range tests {
+			problemConverter := problemConverter
 
 			t.Run("", func(t *testing.T) {
-				problem := factory.NewProblem(context.Background(), errors.New("error")).(*problems.DefaultProblem)
+				problem := problemConverter.NewProblem(context.Background(), errors.New("error")).(*problems.DefaultProblem)
 
 				testProblemEquals(t, problem, http.StatusInternalServerError, "something went wrong")
 			})
@@ -196,9 +196,9 @@ func TestProblemConverter(t *testing.T) {
 			test := test
 
 			t.Run("", func(t *testing.T) {
-				factory := NewProblemConverter(test.config)
+				problemConverter := NewProblemConverter(test.config)
 
-				problem := factory.NewProblem(context.Background(), err).(*problems.DefaultProblem)
+				problem := problemConverter.NewProblem(context.Background(), err).(*problems.DefaultProblem)
 
 				testProblemEquals(t, problem, test.status, test.detail)
 			})
@@ -207,7 +207,7 @@ func TestProblemConverter(t *testing.T) {
 }
 
 func ExampleNewProblemConverter() {
-	factory := NewProblemConverter(ProblemConverterConfig{
+	problemConverter := NewProblemConverter(ProblemConverterConfig{
 		Matchers: []ProblemMatcher{
 			NewStatusProblemMatcher(http.StatusNotFound, ErrorMatcherFunc(func(err error) bool {
 				return err.Error() == "not found"
@@ -217,7 +217,7 @@ func ExampleNewProblemConverter() {
 
 	err := errors.New("not found")
 
-	problem := factory.NewProblem(context.Background(), err).(*problems.DefaultProblem)
+	problem := problemConverter.NewProblem(context.Background(), err).(*problems.DefaultProblem)
 
 	fmt.Println(problem.Status, problem.Detail)
 

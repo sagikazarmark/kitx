@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// EncodeErrorResponseFunc transforms the passed error to a gRPC status error.
+// EncodeErrorResponseFunc transforms the passed error to a gRPC code error.
 // It's designed to be used in gRPC servers, for server-side endpoints.
 type EncodeErrorResponseFunc func(context.Context, error) error
 

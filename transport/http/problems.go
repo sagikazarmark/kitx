@@ -65,11 +65,11 @@ type StatusProblemConverter interface {
 
 type defaultProblemConverter struct{}
 
-func (d defaultProblemConverter) NewProblem(_ context.Context, err error) problems.Problem {
+func (c defaultProblemConverter) NewProblem(_ context.Context, err error) problems.Problem {
 	return problems.NewDetailedProblem(http.StatusInternalServerError, err.Error())
 }
 
-func (d defaultProblemConverter) NewStatusProblem(_ context.Context, status int, err error) problems.StatusProblem {
+func (c defaultProblemConverter) NewStatusProblem(_ context.Context, status int, err error) problems.StatusProblem {
 	return problems.NewDetailedProblem(status, err.Error())
 }
 
@@ -124,8 +124,8 @@ func NewProblemConverter(config ProblemConverterConfig) ProblemConverter {
 	return c
 }
 
-// NewDefaultProblemFactory returns a new ProblemConverter implementation with default configuration.
-func NewDefaultProblemFactory() ProblemConverter {
+// NewDefaultProblemConverter returns a new ProblemConverter implementation with default configuration.
+func NewDefaultProblemConverter() ProblemConverter {
 	return NewProblemConverter(ProblemConverterConfig{})
 }
 
