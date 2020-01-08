@@ -204,8 +204,8 @@ type problemConverterStub struct {
 	problem problems.Problem
 }
 
-func (f problemConverterStub) NewProblem(_ context.Context, _ error) problems.Problem {
-	return f.problem
+func (s problemConverterStub) NewProblem(_ context.Context, _ error) problems.Problem {
+	return s.problem
 }
 
 func testStatusAndContentType(t *testing.T, resp *http.Response, status int, contentType string) {

@@ -5,6 +5,8 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // EncodeErrorResponseFunc transforms the passed error to a gRPC status error.
@@ -23,4 +25,30 @@ func ErrorResponseEncoder(
 
 		return encoder(ctx, resp)
 	}
+}
+
+// StatusConverter creates a new gRPC Status from an error.
+type StatusConverter interface {
+	// NewStatus creates a new gRPC Status from an error.
+	NewStatus(ctx context.Context, err error) *status.Status
+}
+
+type defaultErrorStatusConverter struct{}
+
+func (d defaultErrorStatusConverter) NewStatus(_ context.Context, _ error) *status.Status {
+	return status.New(codes.Internal, "something went wrong")
+}
+
+// NewStatusErrorResponseEncoder returns an error response encoder that encodes errors as gRPC Status errors.
+func NewStatusErrorResponseEncoder(statusConverter StatusConverter) EncodeErrorResponseFunc {
+	return func(ctx context.Context, err error) error {
+		return statusConverter.NewStatus(ctx, err).Err()
+	}
+}
+
+// NewDefaultStatusErrorResponseEncoder returns an error response encoder that encodes errors as gRPC Status errors.
+//
+// The returned encoder encodes every error as Internal error.
+func NewDefaultStatusErrorResponseEncoder() EncodeErrorResponseFunc {
+	return NewStatusErrorResponseEncoder(defaultErrorStatusConverter{})
 }
