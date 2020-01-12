@@ -114,3 +114,23 @@ func TestFailerMiddleware(t *testing.T) {
 		}
 	})
 }
+
+func TestOperationNameMiddleware(t *testing.T) {
+	ctx := context.Background()
+
+	var name string
+
+	ep := func(ctx context.Context, request interface{}) (interface{}, error) {
+		name, _ = OperationName(ctx)
+
+		return nil, nil
+	}
+
+	mw := OperationNameMiddleware("go-kit/endpoint")
+
+	_, _ = mw(ep)(ctx, nil)
+
+	if want, have := "go-kit/endpoint", name; want != have {
+		t.Fatalf("unexpected endpoint name, wanted %q, got %q", want, have)
+	}
+}
