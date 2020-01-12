@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- `endpoint`: Failer middleware now uses a simpler error matcher function type **(Breaking change)**
+- `transport/http`: Problem converter returns an `interface{}` from now **(Breaking change)**
+
+### Removed
+
+- `endpoint`: Deprecated Business error middleware **(Breaking change)**
+- `transport/http`: Deprecated `ProblemErrorEncoder` **(Breaking change)**
+- `transport/http`: Problem converter. See https://github.com/sagikazarmark/appkit **(Breaking change)**
+- `transport/grpc`: Status converter. See https://github.com/sagikazarmark/appkit **(Breaking change)**
+
 
 ## [0.8.0] - 2020-01-09
 
