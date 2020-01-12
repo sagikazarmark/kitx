@@ -188,12 +188,3 @@ func NewXMLProblemErrorEncoder(problemConverter ProblemConverter) kithttp.ErrorE
 func NewDefaultXMLProblemErrorEncoder() kithttp.ErrorEncoder {
 	return errorResponseEncoderWrapper(NewDefaultXMLProblemErrorResponseEncoder())
 }
-
-// nolint: gochecknoglobals
-var defaultJSONProblemErrorEncoder = NewDefaultJSONProblemErrorEncoder()
-
-// ProblemErrorEncoder encodes errors in the Problem RFC format.
-// Deprecated: use NewJSONProblemErrorEncoder or NewDefaultJSONProblemErrorEncoder instead.
-func ProblemErrorEncoder(ctx context.Context, err error, w http.ResponseWriter) {
-	defaultJSONProblemErrorEncoder(ctx, err, w)
-}
