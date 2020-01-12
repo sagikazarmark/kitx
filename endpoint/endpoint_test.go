@@ -56,34 +56,61 @@ func ExampleChain() {
 }
 
 func TestFailerMiddleware(t *testing.T) {
-	var endpointCalled bool
-	berr := errors.New("error")
+	t.Run("failed", func(t *testing.T) {
+		var endpointCalled bool
+		berr := errors.New("error")
 
-	var e endpoint.Endpoint = func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		endpointCalled = true
+		var e endpoint.Endpoint = func(ctx context.Context, request interface{}) (interface{}, error) {
+			endpointCalled = true
 
-		return nil, berr
-	}
-
-	e = FailerMiddleware(ErrorMatcherFunc(func(err error) bool {
-		return true
-	}))(e)
-
-	resp, err := e(context.Background(), nil)
-
-	if !endpointCalled {
-		t.Error("endpoint is supposed to be called")
-	}
-
-	if err != nil {
-		t.Error("error is supposed to be wrapped by the response")
-	}
-
-	if failer, ok := resp.(endpoint.Failer); !ok {
-		t.Error("response is supposed to be a failure response")
-
-		if !errors.Is(failer.Failed(), berr) {
-			t.Error("failure response is supposed to return the wrapped error")
+			return nil, berr
 		}
-	}
+
+		e = FailerMiddleware(func(err error) bool { return err != nil })(e)
+
+		resp, err := e(context.Background(), nil)
+
+		if !endpointCalled {
+			t.Fatal("endpoint is supposed to be called")
+		}
+
+		if err != nil {
+			t.Fatal("error is supposed to be wrapped by the response")
+		}
+
+		if failer, ok := resp.(endpoint.Failer); !ok {
+			t.Error("response is supposed to be a failure response")
+
+			if !errors.Is(failer.Failed(), berr) {
+				t.Error("failure response is supposed to return the wrapped error")
+			}
+		}
+	})
+
+	t.Run("success", func(t *testing.T) {
+		var endpointCalled bool
+		const response = "response"
+
+		var e endpoint.Endpoint = func(ctx context.Context, request interface{}) (interface{}, error) {
+			endpointCalled = true
+
+			return response, nil
+		}
+
+		e = FailerMiddleware(func(err error) bool { return err != nil })(e)
+
+		resp, err := e(context.Background(), nil)
+
+		if !endpointCalled {
+			t.Fatal("endpoint is supposed to be called")
+		}
+
+		if err != nil {
+			t.Fatal("unexpected error: ", err)
+		}
+
+		if resp != response {
+			t.Errorf("unexpected response\nexpected: %s\nactual:   %s", response, resp)
+		}
+	})
 }
