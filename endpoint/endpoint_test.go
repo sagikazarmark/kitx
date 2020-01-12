@@ -29,7 +29,47 @@ func ExampleChain() {
 			}
 		}
 	}
-	e := endpoint.Chain(
+	e := Chain(
+		annotate("first"),
+		annotate("second"),
+		annotate("third"),
+	)(
+		func(context.Context, interface{}) (interface{}, error) {
+			fmt.Println("endpoint")
+
+			return nil, nil
+		},
+	)
+
+	if _, err := e(ctx, req); err != nil {
+		panic(err)
+	}
+
+	// Output:
+	// first pre
+	// second pre
+	// third pre
+	// endpoint
+	// third post
+	// second post
+	// first post
+}
+
+func ExampleCombine() {
+	annotate := func(pos string) endpoint.Middleware {
+		return func(e endpoint.Endpoint) endpoint.Endpoint {
+			return func(ctx context.Context, req interface{}) (response interface{}, err error) {
+				fmt.Println(pos + " pre")
+
+				response, err = e(ctx, req)
+
+				fmt.Println(pos + " post")
+
+				return
+			}
+		}
+	}
+	e := Combine(
 		annotate("first"),
 		annotate("second"),
 		annotate("third"),

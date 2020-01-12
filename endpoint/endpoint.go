@@ -8,7 +8,14 @@ import (
 
 // Chain composes a single middleware from a list.
 // Compared to endpoint.Chain, this function accepts a variadic list.
+// Deprecated: use Combine instead.
 func Chain(mw ...endpoint.Middleware) func(endpoint.Endpoint) endpoint.Endpoint {
+	return Combine(mw...)
+}
+
+// Combine composes a single middleware from a list.
+// Compared to endpoint.Chain, this function accepts a variadic list.
+func Combine(mw ...endpoint.Middleware) func(endpoint.Endpoint) endpoint.Endpoint {
 	if len(mw) == 0 {
 		return func(e endpoint.Endpoint) endpoint.Endpoint {
 			return e
