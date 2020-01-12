@@ -204,7 +204,7 @@ type problemConverterStub struct {
 	problem problems.Problem
 }
 
-func (s problemConverterStub) NewProblem(_ context.Context, _ error) problems.Problem {
+func (s problemConverterStub) NewProblem(_ context.Context, _ error) interface{} {
 	return s.problem
 }
 

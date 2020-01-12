@@ -90,12 +90,12 @@ func errorResponseEncoderWrapper(errorEncoder EncodeErrorResponseFunc) kithttp.E
 // ProblemConverter creates a new RFC-7807 Problem from an error.
 type ProblemConverter interface {
 	// NewProblem creates a new RFC-7807 Problem from an error.
-	NewProblem(ctx context.Context, err error) problems.Problem
+	NewProblem(ctx context.Context, err error) interface{}
 }
 
 type defaultErrorProblemConverter struct{}
 
-func (d defaultErrorProblemConverter) NewProblem(_ context.Context, _ error) problems.Problem {
+func (d defaultErrorProblemConverter) NewProblem(_ context.Context, _ error) interface{} {
 	return problems.NewDetailedProblem(http.StatusInternalServerError, "something went wrong")
 }
 
