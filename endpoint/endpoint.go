@@ -26,18 +26,7 @@ func Chain(mw ...endpoint.Middleware) func(endpoint.Endpoint) endpoint.Endpoint 
 
 // ErrorMatcher is a predicate for errors.
 // It can be used in middleware to decide whether to take action or not.
-type ErrorMatcher interface {
-	// MatchError evaluates the predicate for an error.
-	MatchError(err error) bool
-}
-
-// ErrorMatcherFunc turns a plain function into an ErrorMatcher if it's definition matches the interface.
-type ErrorMatcherFunc func(err error) bool
-
-// MatchError calls the underlying function to evaluate the predicate.
-func (fn ErrorMatcherFunc) MatchError(err error) bool {
-	return fn(err)
-}
+type ErrorMatcher func(err error) bool
 
 type failer struct {
 	err error
@@ -48,11 +37,11 @@ func (f failer) Failed() error {
 }
 
 // FailerMiddleware checks if a returned error matches a predicate and wraps it in a failer response if it does.
-func FailerMiddleware(matcher ErrorMatcher) endpoint.Middleware {
+func FailerMiddleware(errorMatcher ErrorMatcher) endpoint.Middleware {
 	return func(e endpoint.Endpoint) endpoint.Endpoint {
 		return func(ctx context.Context, request interface{}) (interface{}, error) {
 			resp, err := e(ctx, request)
-			if err != nil && matcher.MatchError(err) {
+			if err != nil && errorMatcher(err) {
 				return failer{err}, nil
 			}
 
