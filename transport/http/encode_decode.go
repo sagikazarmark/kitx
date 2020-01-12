@@ -6,10 +6,10 @@ import (
 	"encoding/xml"
 	"net/http"
 
-	"emperror.dev/errors"
 	"github.com/go-kit/kit/endpoint"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/moogar0880/problems"
+	"github.com/pkg/errors"
 )
 
 // NopResponseEncoder can be used for operations without output parameters.
