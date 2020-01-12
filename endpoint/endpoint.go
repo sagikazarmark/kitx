@@ -3,7 +3,6 @@ package endpoint
 import (
 	"context"
 
-	"emperror.dev/errors"
 	"github.com/go-kit/kit/endpoint"
 )
 
@@ -60,19 +59,4 @@ func FailerMiddleware(matcher ErrorMatcher) endpoint.Middleware {
 			return resp, err
 		}
 	}
-}
-
-type businessError interface {
-	// IsBusinessError checks if an error should be returned as a business error from an endpoint.
-	IsBusinessError() bool
-}
-
-// BusinessErrorMiddleware checks if a returned error is a business error and wraps it in a failer response if it is.
-// Deprecated: Use FailerMiddleware instead.
-func BusinessErrorMiddleware(e endpoint.Endpoint) endpoint.Endpoint {
-	return FailerMiddleware(ErrorMatcherFunc(func(err error) bool {
-		var berr businessError
-
-		return errors.As(err, &berr) && berr.IsBusinessError()
-	}))(e)
 }

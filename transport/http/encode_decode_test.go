@@ -395,33 +395,3 @@ func TestNewDefaultXMLProblemErrorEncoder(t *testing.T) {
 		t.Errorf("unexpected detail\nexpected: %s\nactual:   %s", want, have)
 	}
 }
-
-func TestProblemErrorEncoder(t *testing.T) {
-	handler := kithttp.NewServer(
-		func(context.Context, interface{}) (interface{}, error) {
-			return nil, errors.New("error")
-		},
-		kithttp.NopRequestDecoder,
-		JSONResponseEncoder,
-		kithttp.ServerErrorEncoder(ProblemErrorEncoder),
-	)
-
-	server := httptest.NewServer(handler)
-	defer server.Close()
-
-	resp, err := http.Get(server.URL)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer resp.Body.Close()
-
-	if want, have := http.StatusInternalServerError, resp.StatusCode; want != have {
-		t.Errorf("unexpected status code\nexpected: %d\nactual:   %d", want, have)
-	}
-
-	expectedBody := `{"type":"about:blank","title":"Internal Server Error","status":500,"detail":"something went wrong"}`
-	buf, _ := ioutil.ReadAll(resp.Body)
-	if want, have := expectedBody, strings.TrimSpace(string(buf)); want != have {
-		t.Errorf("unexpected body\nexpected: %s\nactual:   %s", want, have)
-	}
-}
