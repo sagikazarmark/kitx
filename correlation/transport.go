@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-// Capital letters are invalid in HTTP/2
+// Note: capital letters are invalid in HTTP/2.
 const defaultCorrelationHeader = "correlation-id"
 
 // HTTPToContext moves a correlation ID from request header to context (if any).

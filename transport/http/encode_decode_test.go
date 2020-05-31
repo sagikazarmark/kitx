@@ -281,7 +281,6 @@ func TestNewJSONProblemErrorEncoder(t *testing.T) {
 	})
 }
 
-// nolint: dupl
 func TestNewDefaultJSONProblemErrorEncoder(t *testing.T) {
 	errorEncoder := NewDefaultJSONProblemErrorEncoder()
 
@@ -369,7 +368,6 @@ func TestNewXMLProblemErrorEncoder(t *testing.T) {
 	})
 }
 
-// nolint: dupl
 func TestNewDefaultXMLProblemErrorEncoder(t *testing.T) {
 	errorEncoder := NewDefaultXMLProblemErrorEncoder()
 
