@@ -19,7 +19,7 @@ func NopResponseEncoder(_ context.Context, _ http.ResponseWriter, _ interface{})
 }
 
 // StatusCodeResponseEncoder can be used for operations without output parameters.
-// It returns 200 OK status code without a response body.
+// It returns status code given without a response body.
 func StatusCodeResponseEncoder(code int) kithttp.EncodeResponseFunc {
 	return func(_ context.Context, w http.ResponseWriter, _ interface{}) error {
 		w.WriteHeader(code)
