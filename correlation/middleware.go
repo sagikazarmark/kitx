@@ -13,7 +13,7 @@ func generate() string {
 	b := make([]byte, 32)
 
 	for i := range b {
-		b[i] = charset[rand.Intn(len(charset))]
+		b[i] = charset[rand.Intn(len(charset))] // nolint: gosec
 	}
 
 	return string(b)
