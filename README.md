@@ -5,7 +5,6 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/sagikazarmark/kitx?style=flat-square)](https://goreportcard.com/report/github.com/sagikazarmark/kitx)
 ![Go Version](https://img.shields.io/badge/go%20version-%3E=1.15-61CFDD.svg?style=flat-square)
 [![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/mod/github.com/sagikazarmark/kitx)
-[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B8125%2Fkitx.svg?type=shield)](https://app.fossa.com/projects/custom%2B8125%2Fkitx?ref=badge_shield)
 
 
 ## Installation
@@ -27,5 +26,3 @@ make check
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE) for more information.
-
-[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B8125%2Fkitx.svg?type=large)](https://app.fossa.com/projects/custom%2B8125%2Fkitx?ref=badge_large)
