@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- Go kit updated to [v0.11.0](https://github.com/go-kit/kit/releases/tag/v0.11.0)
+- Updated dependencies
+
 
 ## [0.14.0] - 2020-06-09
 
