@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+
+## [0.15.0] - 2021-07-04
+
 ### Changed
 
 - Go kit updated to [v0.11.0](https://github.com/go-kit/kit/releases/tag/v0.11.0)
@@ -143,7 +146,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Initial release
 
 
-[Unreleased]: https://github.com/sagikazarmark/kitx/compare/v0.14.0...HEAD
+[Unreleased]: https://github.com/sagikazarmark/kitx/compare/v0.15.0...HEAD
+[0.15.0]: https://github.com/sagikazarmark/kitx/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/sagikazarmark/kitx/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/sagikazarmark/kitx/compare/v0.12.0...v0.13.0
 [0.12.0]: https://github.com/sagikazarmark/kitx/compare/v0.11.0...v0.12.0
