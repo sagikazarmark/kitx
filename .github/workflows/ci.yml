@@ -11,42 +11,43 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     env:
-      VERBOSE: 1
       GOFLAGS: -mod=readonly
 
     steps:
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.17
-
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Set up Nix
+        uses: cachix/install-nix-action@v13
+        with:
+          install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-2.4pre20210604_8e6ee1b/install
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
       - name: Lint
-        run: make lint
+        run: nix develop -c make lint
 
   test:
     name: Test
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go: ['1.15', '1.16', '1.17']
     env:
-      VERBOSE: 1
       GOFLAGS: -mod=readonly
 
     steps:
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: ${{ matrix.go }}
-
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Set up Nix
+        uses: cachix/install-nix-action@v13
+        with:
+          install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-2.4pre20210604_8e6ee1b/install
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
       - name: Test
-        run: make test
+        run: nix develop -c make test
 
       - name: Upload coverage
         uses: codecov/codecov-action@v1
