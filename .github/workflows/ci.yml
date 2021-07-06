@@ -31,6 +31,9 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: ['1_15', '1_16']
     env:
       GOFLAGS: -mod=readonly
 
@@ -47,7 +50,7 @@ jobs:
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
 
       - name: Test
-        run: nix develop -c make test
+        run: nix shell .#go${{ matrix.go }} -c make test
 
       - name: Upload coverage
         uses: codecov/codecov-action@v1
