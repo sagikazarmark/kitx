@@ -14,7 +14,7 @@ test: TEST_FORMAT ?= short
 test: export CGO_ENABLED=1
 test: ## Run tests
 	@mkdir -p ${BUILD_DIR}
-	gotestsum --no-summary=skipped --junitfile ${BUILD_DIR}/coverage.xml --format ${TEST_FORMAT} -- -race -coverprofile=${BUILD_DIR}/coverage.txt -covermode=atomic ./...
+	gotestsum --no-summary=skipped --junitfile ${BUILD_DIR}/coverage.xml --jsonfile ${BUILD_DIR}/test.json --format ${TEST_FORMAT} -- -race -coverprofile=${BUILD_DIR}/coverage.txt -covermode=atomic ./...
 
 .PHONY: lint
 lint: ## Run linter

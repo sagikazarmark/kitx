@@ -54,6 +54,12 @@ jobs:
       - name: Test
         run: nix shell .#go$(echo "${{ matrix.go }}" | sed "s/\./_/") -c make test
 
+      - name: Annotate tests
+        uses: guyarb/golang-test-annotations@v0.4.0
+        if: always()
+        with:
+          test-results: build/test.json
+
       - name: Upload coverage
         uses: codecov/codecov-action@v2
         if: always()
