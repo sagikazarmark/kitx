@@ -18,7 +18,7 @@ test: ## Run tests
 
 .PHONY: lint
 lint: ## Run linter
-	golangci-lint run
+	golangci-lint run ${LINT_ARGS}
 
 .PHONY: fix
 fix: ## Fix lint violations

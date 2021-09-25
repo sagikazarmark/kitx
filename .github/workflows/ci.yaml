@@ -27,6 +27,8 @@ jobs:
 
       - name: Lint
         run: nix develop -c make lint
+        env:
+          LINT_ARGS: --out-format=github-actions
 
   test:
     name: Test
