@@ -5,7 +5,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/sagikazarmark/kitx?style=flat-square)](https://goreportcard.com/report/github.com/sagikazarmark/kitx)
 ![Go Version](https://img.shields.io/badge/go%20version-%3E=1.16-61CFDD.svg?style=flat-square)
 [![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/mod/github.com/sagikazarmark/kitx)
-[![built with nix](https://img.shields.io/badge/builtwith-nix-7d81f7&style=flat-square)](https://builtwithnix.org)
+[![built with nix](https://img.shields.io/badge/builtwith-nix-7d81f7?style=flat-square)](https://builtwithnix.org)
 
 
 ## Installation
