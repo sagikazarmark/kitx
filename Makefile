@@ -1,5 +1,7 @@
 # A Self-Documenting Makefile: http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 
+export PATH := $(abspath bin/):${PATH}
+
 # Build variables
 BUILD_DIR ?= build
 export CGO_ENABLED ?= 0
@@ -21,6 +23,21 @@ lint: ## Run linter
 .PHONY: fix
 fix: ## Fix lint violations
 	golangci-lint run --fix
+
+# Dependency versions
+GOTESTSUM_VERSION ?= 1.7.0
+GOLANGCI_VERSION ?= 1.42.1
+
+deps: bin/gotestsum bin/golangci-lint
+
+bin/gotestsum:
+	@mkdir -p bin
+	curl -L https://github.com/gotestyourself/gotestsum/releases/download/v${GOTESTSUM_VERSION}/gotestsum_${GOTESTSUM_VERSION}_$(shell uname | tr A-Z a-z)_amd64.tar.gz | tar -zOxf - gotestsum > ./bin/gotestsum
+	@chmod +x ./bin/gotestsum
+
+bin/golangci-lint:
+	@mkdir -p bin
+	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | BINARY=golangci-lint bash -s -- v${GOLANGCI_VERSION}
 
 .PHONY: help
 .DEFAULT_GOAL := help
