@@ -25,12 +25,6 @@
       in {
         devShell = pkgs.mkShell {
           buildInputs = devDeps;
-
-          shellHook = ''
-            echo -e "Welcome to the developer console!\n"
-            echo "Available make commands:"
-            make
-          '';
         };
 
         packages.go1_15 = generateGoEnv pkgs.go_1_15;
