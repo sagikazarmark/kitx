@@ -10,8 +10,6 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    env:
-      GOFLAGS: -mod=readonly
 
     steps:
       - name: Checkout code
@@ -36,8 +34,6 @@ jobs:
     strategy:
       matrix:
         go: ['1.15', '1.16', '1.17']
-    env:
-      GOFLAGS: -mod=readonly
 
     steps:
       - name: Checkout code
