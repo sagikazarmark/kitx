@@ -10,7 +10,7 @@
 
 ## Installation
 
-```bash
+```shell
 go get github.com/sagikazarmark/kitx
 ```
 
@@ -19,7 +19,7 @@ go get github.com/sagikazarmark/kitx
 
 When all coding and testing is done, please run the test suite:
 
-```bash
+```shell
 make check
 ```
 
