@@ -26,8 +26,3 @@ make check
 For the best developer experience, install [Nix](https://builtwithnix.org/) and [direnv](https://direnv.net/).
 
 Alternatively, install Go manually or using a package manager. Install the rest of the dependencies by running `make deps`.
-
-
-## License
-
-The MIT License (MIT). Please see [License File](LICENSE) for more information.
