@@ -17,7 +17,8 @@
           pkgs.mkShell {
             buildInputs = (pkgs.lib.remove pkgs.go devDeps) ++ [ go ];
           };
-      in {
+      in
+      {
         devShell = pkgs.mkShell {
           buildInputs = devDeps;
         };
