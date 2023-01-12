@@ -7,24 +7,38 @@
   };
 
   outputs = { self, nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
-        buildDeps = with pkgs; [ git go gnumake ];
-        devDeps = with pkgs; buildDeps ++ [ golangci-lint gotestsum ];
+    flake-utils.lib.eachDefaultSystem
+      (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          buildDeps = with pkgs; [ git go gnumake ];
+          devDeps = with pkgs; buildDeps ++ [ golangci-lint gotestsum ];
 
-        goShell = go:
-          pkgs.mkShell {
-            buildInputs = (pkgs.lib.remove pkgs.go devDeps) ++ [ go ];
-          };
-      in
-      {
-        devShell = pkgs.mkShell {
-          buildInputs = devDeps;
-        };
+          ciShell = go:
+            pkgs.mkShell {
+              buildInputs = with pkgs; [
+                git
+                gnumake
+                gotestsum
+              ] ++ [ go ];
+            };
 
-        devShells.go1_15 = goShell pkgs.go_1_15;
-        devShells.go1_16 = goShell pkgs.go_1_16;
-        devShells.go1_17 = goShell pkgs.go_1_17;
-      });
+          goVerToPkg = goVersion: builtins.replaceStrings [ "." ] [ "_" ] goVersion;
+
+          genCiShells = goVersions:
+            builtins.listToAttrs (map (goVersion: pkgs.lib.attrsets.nameValuePair "ci${goVerToPkg goVersion}" (ciShell pkgs."go_${goVerToPkg goVersion}")) goVersions);
+        in
+        {
+          devShells = {
+            default = pkgs.mkShell {
+              buildInputs = with pkgs; [
+                git
+                go_1_19
+                gnumake
+                golangci-lint
+                gotestsum
+              ];
+            };
+          } // genCiShells [ "1.18" "1.19" ];
+        });
 }
