@@ -25,8 +25,8 @@ fix: ## Fix lint violations
 	golangci-lint run --fix
 
 # Dependency versions
-GOTESTSUM_VERSION ?= 1.7.0
-GOLANGCI_VERSION ?= 1.43.0
+GOTESTSUM_VERSION ?= 1.8.2
+GOLANGCI_VERSION ?= 1.50.1
 
 deps: bin/gotestsum bin/golangci-lint
 

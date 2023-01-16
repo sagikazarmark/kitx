@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -81,7 +81,7 @@ func TestJSONResponseEncoder(t *testing.T) {
 		t.Errorf("unexpected status code\nexpected: %d\nactual:   %d", want, have)
 	}
 
-	buf, _ := ioutil.ReadAll(resp.Body)
+	buf, _ := io.ReadAll(resp.Body)
 	if want, have := `{"foo":"bar"}`, strings.TrimSpace(string(buf)); want != have {
 		t.Errorf("unexpected body\nexpected: %s\nactual:   %s", want, have)
 	}
@@ -157,7 +157,7 @@ func TestErrorResponseEncoder(t *testing.T) {
 			t.Errorf("unexpected status code\nexpected: %d\nactual:   %d", want, have)
 		}
 
-		buf, _ := ioutil.ReadAll(resp.Body)
+		buf, _ := io.ReadAll(resp.Body)
 		if want, have := `{"foo":"bar"}`, strings.TrimSpace(string(buf)); want != have {
 			t.Errorf("unexpected body\nexpected: %s\nactual:   %s", want, have)
 		}
@@ -193,7 +193,7 @@ func TestErrorResponseEncoder(t *testing.T) {
 		}
 
 		expectedBody := `{"type":"about:blank","title":"Bad Request","status":400,"detail":"error"}`
-		buf, _ := ioutil.ReadAll(resp.Body)
+		buf, _ := io.ReadAll(resp.Body)
 		if want, have := expectedBody, strings.TrimSpace(string(buf)); want != have {
 			t.Errorf("unexpected body\nexpected: %s\nactual:   %s", want, have)
 		}

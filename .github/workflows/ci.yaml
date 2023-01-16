@@ -10,6 +10,9 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: nix develop -c bash {0}
 
     steps:
       - name: Checkout code
@@ -22,7 +25,7 @@ jobs:
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
 
       - name: Lint
-        run: nix develop -c make lint
+        run: make lint
         env:
           LINT_ARGS: --out-format=github-actions
 
@@ -31,7 +34,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: ['1.15', '1.16', '1.17']
+        go: ['1_18', '1_19']
+    defaults:
+      run:
+        shell: nix develop .#ci${{ matrix.go }} -c bash {0}
 
     steps:
       - name: Checkout code
@@ -44,7 +50,7 @@ jobs:
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
 
       - name: Test
-        run: nix develop .#go$(echo "${{ matrix.go }}" | sed "s/\./_/") -c make test
+        run: make test
 
       - name: Annotate tests
         uses: guyarb/golang-test-annotations@v0.6.0
