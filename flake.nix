@@ -33,12 +33,12 @@
             default = pkgs.mkShell {
               buildInputs = with pkgs; [
                 git
-                go_1_19
+                go_1_23
                 gnumake
                 golangci-lint
                 gotestsum
               ];
             };
-          } // genCiShells [ "1.18" "1.19" ];
+          } // genCiShells [ "1.21" "1.22" "1.23" ];
         });
 }

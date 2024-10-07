@@ -1,6 +1,9 @@
 linters-settings:
-    golint:
-        min-confidence: 0.1
+    gci:
+        sections:
+            - standard
+            - default
+            - prefix(github.com/sagikazarmark/kitx)
     goimports:
         local-prefixes: github.com/sagikazarmark/kitx
 
@@ -12,3 +15,4 @@ linters:
         - import
     disable:
         - noctx
+        - depguard

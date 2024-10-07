@@ -2,6 +2,7 @@ package correlation
 
 import (
 	"context"
+	"math/rand"
 	"testing"
 )
 
@@ -30,6 +31,9 @@ func TestMiddleware(t *testing.T) {
 
 	t.Run("generated", func(t *testing.T) {
 		cid := "BpLnfgDsc2WD8F2qNfHK5a84jjJkwzDk" // Result of seed(1)
+
+		//nolint
+		rand.Seed(1)
 
 		e := func(ctx context.Context, _ interface{}) (interface{}, error) {
 			c := ctx.Value(correlationIDContextKey)
