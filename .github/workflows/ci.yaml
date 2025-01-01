@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: ["1_21", "1_22", "1_23"]
+        go: ["1_22", "1_23"]
     defaults:
       run:
         shell: nix develop .#ci${{ matrix.go }} -c bash {0}
