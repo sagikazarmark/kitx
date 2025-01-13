@@ -7,7 +7,7 @@ require (
 	github.com/go-kit/log v0.2.1
 	github.com/moogar0880/problems v0.1.1
 	github.com/pkg/errors v0.9.1
-	google.golang.org/grpc v1.69.2
+	google.golang.org/grpc v1.69.4
 )
 
 require (
